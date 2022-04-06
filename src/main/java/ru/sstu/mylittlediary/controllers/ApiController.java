@@ -96,7 +96,10 @@ public class ApiController {
             List<Case> cases = caseService.findAllByUser(user);
             StringBuilder result = new StringBuilder();
             for (Case c : cases) {
-                result.append(c.toString()).append("\n");
+                result.append("Название: ").append(c.getName()).append("\n");
+                result.append("Описание: ").append(c.getDescription()).append("\n");
+                result.append("Дата создания: ").append(c.getCreationDate()).append("\n");
+                result.append("Дата выполнения: ").append(c.getDeadline()).append("\n\n");
             }
             InputStream is = new ByteArrayInputStream(result.toString().getBytes(StandardCharsets.UTF_8));
             IOUtils.copy(is, response.getOutputStream());
@@ -112,7 +115,9 @@ public class ApiController {
             List<Note> notes = noteService.findAllByUser(user);
             StringBuilder result = new StringBuilder();
             for (Note note : notes) {
-                result.append(note.toString()).append("\n");
+                result.append("Название: ").append(note.getName()).append("\n");
+                result.append("Описание: ").append(note.getDescription()).append("\n");
+                result.append("Дата создания: ").append(note.getCreationDate()).append("\n\n");
             }
             InputStream is = new ByteArrayInputStream(result.toString().getBytes(StandardCharsets.UTF_8));
             IOUtils.copy(is, response.getOutputStream());
