@@ -1,0 +1,353 @@
+html,
+body {
+    background: url('../img/background.jpg') no-repeat 50% 50%;
+    background-size: 100% 100%;
+    backdrop-filter: blur(4px) hue-rotate(30deg);
+    font-family: cursive;
+    min-height: 100vh !important;
+    height: auto !important;
+    max-height: 100vh !important;
+    overflow: hidden;
+}
+
+.navbar-brand {
+    font-family: cursive !important;
+}
+
+.bg-navbar {
+    background: linear-gradient(180deg, #fffffff1 50%, #fff0f2f5);
+}
+
+.box {
+    display: block;
+    width: 10px;
+    height: 10px;
+}
+
+.btn-pony {
+    background-color: #9f9fff !important;
+    border-color: #9f9fff !important;
+    color: white !important;
+}
+
+
+.todo-pony {
+    background-color: #9f9fff !important;
+}
+
+.todo .list-group-item {
+    background-color: transparent !important;
+}
+
+.orange {
+    background-color: orange;
+}
+
+.green {
+    background-color: green;
+}
+
+.grey {
+    background-color: grey;
+}
+
+.bg-white-transparent {
+    background: rgba(255, 255, 255, 0.842);
+
+}
+
+.content-wrapper {
+    height: 85vh;
+    background: rgb(255, 255, 255);
+}
+
+.gif-small {
+    width: 150px;
+    height: 150px;
+}
+
+
+.gif-top-wrapper {
+    right: 3%;
+    z-index: 1003;
+}
+
+.gif-top-wrapper .gif-small {
+    width: 100px;
+    height: 100px;
+}
+
+
+.left-part,
+.right-part {
+    background: rgb(255, 255, 255);
+}
+
+.organizerContainerWrapper {
+    z-index: 1001;
+}
+
+.left-part {
+    z-index: 1001;
+    background: white;
+}
+
+#todo-list {
+
+    bottom: 15%;
+    z-index: 1001;
+    background: white;
+    /* height: 5vh; */
+}
+
+#todo-list #todo-wrapper {
+    overflow-y: auto;
+}
+
+.todo {
+    /* display: inline; */
+    margin-bottom: 3px;
+    width: 100%;
+    min-height: 5.5rem;
+    max-height: 5.5rem;
+    background-color: white;
+}
+
+.note {
+    margin-left: 5rem;
+    margin-bottom: 5rem;
+    width: 10rem;
+    height: 15rem;
+    /*white-space: pre-wrap;*/
+    overflow: hidden;
+    position: relative;
+    cursor: pointer;
+}
+
+.modal-content {
+    width: 150% !important;
+    transform: translate(-25%);
+}
+
+#note-description-input,
+#new-note-description,
+#new-todo-description,
+#todo-description-input {
+    height: 25rem;
+    resize: none;
+}
+
+
+#todo-fullsize {
+    background: white;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+#note-fullsize {
+    background: white;
+    position: absolute;
+    top: 0;
+    right: 0;
+    display: none;
+    width: 100%;
+    height: 100%;
+    z-index: 1005;
+}
+
+.note-pony:after,
+.note:after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 40px;
+    background: linear-gradient(180deg, transparent, #fff0f2 50%);
+}
+
+.note-pony::after {
+    background: linear-gradient(180deg, transparent, #9f9fff 50%) !important;
+}
+
+#calendarEditTodoWrapper,
+#calendarWrapper {
+    z-index: 1003;
+    position: fixed;
+    display: none;
+    background: transparent;
+    opacity: 0;
+}
+
+
+#calendarTodoWrapper {
+    z-index: 1003;
+    overflow: hidden;
+    display: none;
+    left: 100%;
+    opacity: 0;
+}
+
+#note-list {
+    bottom: 15%;
+    max-height: 100%;
+}
+
+#note-list #note-wrapper {
+    overflow-y: auto;
+}
+
+#note-list .toolbar {
+    margin-left: 5rem;
+}
+
+
+.cjslib-month,
+.cjslib-date,
+.cjslib-year {
+    width: 100% !important;
+}
+
+.cjslib-rows {
+    display: none !important;
+}
+
+.cjslib-events.cjslib-size-small {
+    height: 20px !important;
+    width: 100% !important;
+}
+
+.cjslib-calendar.cjslib-size-small {
+    width: 100% !important;
+}
+
+#changeTodoOrganizerContainer-date:hover,
+#organizerContainer-date:hover {
+    cursor: pointer;
+}
+
+
+.form-control::-webkit-scrollbar,
+div::-webkit-scrollbar {
+    width: 12px;
+    /* ширина scrollbar */
+}
+
+
+.form-control::-webkit-scrollbar-track,
+div::-webkit-scrollbar-track {
+    background: rgb(255, 255, 255);
+    /* цвет дорожки */
+}
+
+.form-control::-webkit-scrollbar-thumb,
+div::-webkit-scrollbar-thumb {
+    background-color: #9f9fff;
+    /* цвет плашки */
+    border-radius: 20px;
+    /* закругления плашки */
+    border: 3px solid rgb(255, 255, 255);
+    /* padding вокруг плашки */
+}
+
+
+#calendarContainer-label-1,
+#calendarContainer-label-2,
+#calendarContainer-label-3,
+#calendarContainer-label-4,
+#calendarContainer-label-5,
+#calendarContainer-label-6,
+#calendarContainer-label-7 {
+    font-size: 65%;
+}
+
+
+.complete {
+    position: relative;
+}
+
+.complete:after {
+    position: absolute;
+    content: '';
+    width: 100%;
+    height: 3px;
+    background: #9393a7;
+    top: 50%;
+}
+
+.prelogout,
+.preloader {
+    position: fixed;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+    background: #fff;
+    z-index: 1001;
+}
+.prelogout__image,
+.preloader__image {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.preloader__image{
+    background: url('../img/my-little-pony-friendship-is-magic-crazy.gif') no-repeat 50% 50%; /*расположение (url) изображения gif и др. параметры*/
+
+}
+
+.prelogout__image{
+    background: url('../img/logout.gif') no-repeat 50% 50%; /*расположение (url) изображения gif и др. параметры*/
+}
+
+.loaded_hiding .preloader {
+    transition: 1.5s opacity;
+    display: block;
+    opacity: 0;
+}
+
+.logout .prelogout{
+    display: block;
+    opacity: 1;
+}
+
+.logout_hiding .prelogout{
+
+
+    display: block;
+}
+.logout_opacity .prelogout{
+    opacity: 1;
+}
+
+.prelogout,
+.loaded .preloader {
+    transition: 1.5s opacity;
+    opacity: 0;
+    display: none;
+}
+.prelogout,
+.first-loaded_hiding .preloader {
+    /*transition: 5s opacity;*/
+    /*transition-timing-function: ease-in;*/
+    z-index: 2000;
+    /*opacity: 0;*/
+}
+
+.hidden{
+    visibility: hidden;
+}
+.prelogout .greeting,
+.preloader .greeting{
+    font-size: 4rem;
+    font-family: cursive;
+    position: absolute;
+    top: 30%;
+    left: 50%;
+    transform: translate(-60%, -50%)
+}

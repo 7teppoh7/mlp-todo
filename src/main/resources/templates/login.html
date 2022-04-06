@@ -1,0 +1,70 @@
+<!doctype html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org" lang="ru">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="">
+  <meta name="author" content="">
+  <link rel="icon" type="image/png" th:href="@{/img/logo.png}"/>
+
+  <title>My Little Dairy : Login</title>
+
+  <link rel="canonical" href="https://getbootstrap.com/docs/4.0/examples/sign-in/">
+
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+
+  <link href="https://cdn.rawgit.com/nizarmah/calendar-javascript-lib/master/calendarorganizer.min.css"
+    rel="stylesheet" />
+  <script src="https://cdn.rawgit.com/nizarmah/calendar-javascript-lib/master/calendarorganizer.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+    integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+    crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
+    crossorigin="anonymous"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk="
+    crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-scrollTo/2.1.3/jquery.scrollTo.min.js"></script>
+  <script src="https://code.jquery.com/ui/1.13.1/jquery-ui.js"></script>
+
+
+  <!-- Custom styles for this template -->
+  <link rel="stylesheet"
+        th:href="@{/css/login.css}"/>
+</head>
+
+<body>
+  <div class="text-center d-flex justify-content-center align-items-center h-100 w-100">
+    <div class="from-wrapper px-5 py-2">
+      <form class="form-signin" method="post" th:action="@{/login}">
+        <div class="form-img-wrapper rounded-top shadow bg-white-transparent px-3 pt-2">
+          <img class="h-50 w-50" th:src="@{/img/logo.png}" alt="...">
+        </div>
+        <div class="alert alert-info" th:if="${param.logout}">
+          Вы вышли из системы
+        </div>
+        <div class="form-content-wrapper rounded-bottom shadow w-100 px-4 py-2">
+          <h1 class="h3 mb-3 font-weight-normal">Добро пожаловать!</h1>
+          <label for="inputEmail" class="sr-only">Адрес электронной почты</label>
+          <input type="text" id="inputEmail" class="form-control" placeholder="имя" name="username" required autofocus>
+          <label for="inputPassword" class="sr-only">Пароль</label>
+          <input type="password" id="inputPassword" class="form-control" placeholder="пароль" name="password" required>
+          <div class="alert alert-danger" th:if="${param.error}">
+            Неверный логин или пароль
+          </div>
+          <button class="btn btn-lg btn-primary btn-light" type="submit">Войти</button>
+          <hr>
+          <div><a th:href="@{/register}">Регистрация</a></div>
+          <p class="mt-5 mb-3 text-muted">&copy; 2022 MyLittleDiary</p>
+        </div>
+      </form>
+    </div>
+  </div>
+</body>
+
+</html>

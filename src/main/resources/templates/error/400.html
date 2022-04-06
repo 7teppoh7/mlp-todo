@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>400</title>
+</head>
+<body>
+<h1>400 Bad Request</h1>
+
+<th:block th:if="${messages != null}">
+    <h2>Причины:</h2>
+
+    <div th:each="message : ${messages}">
+        <b th:text="${message.key}"></b>
+        <div th:text="${message.value}"></div>
+        <p></p>
+    </div>
+</th:block>
+<a th:href="@{/notes}">На главную</a>
+</body>
+</html>

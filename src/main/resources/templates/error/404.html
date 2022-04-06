@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>404</title>
+</head>
+<body>
+<h1>404 Not Found</h1>
+
+<th:block th:if="${message != null}">
+    <h2 th:text="${message}"></h2>
+</th:block>
+
+<a th:href="@{/notes}">На главную</a>
+</body>
+</html>

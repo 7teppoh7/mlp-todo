@@ -1,0 +1,1137 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org" lang="ru">
+
+<head>
+    <!-- calendar - https://github.com/nizarmah/calendar-javascript-lib#-doc -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" th:href="@{/img/logo.png}"/>
+
+    <title>My Little Dairy</title>
+    <link rel="stylesheet" th:href="@{/css/mlp.css}">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+
+    <link href="https://cdn.rawgit.com/nizarmah/calendar-javascript-lib/master/calendarorganizer.min.css"
+          rel="stylesheet"/>
+    <script src="https://cdn.rawgit.com/nizarmah/calendar-javascript-lib/master/calendarorganizer.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+            integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+            crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
+            crossorigin="anonymous"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.js"
+            integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-scrollTo/2.1.3/jquery.scrollTo.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.1/jquery-ui.js"></script>
+
+</head>
+
+<body>
+
+<div class="preloader">
+    <div class="h5 greeting" th:text="${'Привет, ' + username + '!'}"></div>
+    <div class="preloader__image"></div>
+</div>
+
+<div class="prelogout">
+    <div class="h5 greeting" th:text="${'Пока, ' + username + '!'}"></div>
+    <div class="prelogout__image"></div>
+</div>
+
+<script>
+    window.onload = function () {
+        var isAlreadyLoaded = localStorage.getItem('loaded');
+        console.log(isAlreadyLoaded, isAlreadyLoaded === null);
+        console.log('loaded1')
+
+        if (isAlreadyLoaded === null || isAlreadyLoaded === 'false') {
+            document.body.classList.add('first-loaded_hiding');
+            window.setTimeout(function () {
+                document.body.classList.add('loaded_hiding');
+                document.body.classList.remove('first-loaded_hiding');
+                document.getElementById('content').classList.remove('hidden');
+                console.log('loaded2')
+
+                window.setTimeout(function () {
+                    document.body.classList.add('loaded');
+                    document.body.classList.remove('loaded_hiding');
+                    console.log('loaded3')
+                }, 1500);
+            }, 1500);
+
+            localStorage.setItem('loaded', 'true');
+        } else {
+            document.body.classList.add('loaded');
+            document.getElementById('content').classList.remove('hidden');
+        }
+    }
+
+
+    function logout() {
+        // document.body.classList.remove('loaded');
+        document.body.classList.add('logout_hiding');
+        window.setTimeout(function () {
+            document.body.classList.add('logout_opacity');
+        }, 15);
+        // document.getElementById('content').classList.remove('hidden');
+        window.setTimeout(function () {
+            document.body.classList.remove('logout_hiding');
+            document.body.classList.add('logout');
+
+            window.setTimeout(function () {
+                localStorage.setItem('loaded', false);
+                document.getElementById('logoutForm').submit();
+            }, 500);
+        }, 1500);
+    }
+</script>
+<div id="content" class="hidden">
+
+    <nav class="navbar navbar-light bg-navbar">
+        <div class="container-fluid">
+            <a class="navbar-brand" style="height: 45px;" id="reset-navbar" href="#"><img th:src="@{/img/logo.png}"
+                                                                                          alt=""
+                                                                                          class="d-inline-block align-text-top h-100">
+                <span class="px-1 d-inline-block"
+                      th:text="${'My Little Diary           Привет, ' + username + '!'}"></span>
+            </a>
+            <form action="/logout" id="logoutForm">
+                <button type="button" class="btn btn-pony" onclick="logout();">Выйти</button>
+            </form>
+        </div>
+    </nav>
+
+    <div class="container-fluid mh-100 h-100 main-container">
+        <div class="position-relative">
+            <div class="shadow p-3 mh-100 mb-5 mt-3 rounded content-wrapper d-flex flex-column">
+                <div class="d-flex flex-row h-100">
+                    <!-- left -->
+                    <div class="w-25 h-100 position-relative left-part">
+                        <div id="todo-fullsize">
+                            <form th:action="@{/notes/editCase}" method="post" id="edit-case-form">
+                                <div class="offcanvas-header">
+                                    <div>
+                                        <h5 class="offcanvas-title" id="todo-name"></h5>
+                                        <input type="text" id="todo-name-input" name="name"
+                                               class="form-control offcanvas-title h5 d-none" placeholder="Название">
+                                        <input type="hidden" id="edit-todo-id-input"
+                                               name="id"/>
+                                    </div>
+                                    <div>
+                                        <div class="btn-group" role="group"
+                                             aria-label="Basic checkbox toggle button group">
+                                            <input type="checkbox" class="btn-check" id="todo-edit-check"
+                                                   autocomplete="off">
+                                            <input type="button" class="btn-check" id="deleteCaseCheckbox"
+                                                   autocomplete="off" onclick="deleteCase()">
+                                            <label class="btn btn-outline-danger" for="deleteCaseCheckbox">
+                                                <i class="fa fa-trash" aria-hidden="true"></i>
+                                            </label><br>
+                                            <input type="button" class="btn-check" id="completeCaseCheckbox"
+                                                   autocomplete="off" onclick="completeCase()">
+                                            <label class="btn btn-outline-secondary" for="completeCaseCheckbox">
+                                                <i class="fa fa-minus-square" aria-hidden="true"></i>
+                                            </label>
+                                            <label class="btn btn-outline-secondary" for="todo-edit-check"
+                                                   onclick="toggleTodoEdit()">
+                                                <i class="fa fa-edit" aria-hidden="true"></i>
+                                            </label>
+
+                                        </div>
+                                        <button type="button" class="btn-close text-reset"
+                                                onclick="{toggleTodoFullSize(); $('div.todo.todo-pony')[0].classList.remove('todo-pony')}"
+                                                aria-label="Закрыть"></button>
+                                    </div>
+
+                                </div>
+                                <div class="offcanvas-body">
+                                    <div id="todo-deadline">
+                                        <p>Дата выполнения: <span></span>
+                                        </p>
+                                    </div>
+
+                                    <div id="todo-deadline-input" class="d-none">
+
+                                        <div class="col-auto position-relative mb-4 mt-0 w-50">
+                                            <div id="editTodoOrganizerContainer"></div>
+                                            <div class="position-absolute rounded shadow top-0"
+                                                 id="calendarEditTodoWrapper">
+                                                <div class="card-header bg-light d-flex flex-row-reverse bd-highlight m-0">
+                                                    <button type="button" class="btn-close text-reset"
+                                                            onclick="toggleTodoCalendar('#calendarEditTodoWrapper')"
+                                                            aria-label="Закрыть"></button>
+                                                </div>
+                                                <div id="editTodoCalendarContainer" class="m-0"></div>
+                                            </div>
+                                            <input type="hidden" id="edit-todo-date-input"
+                                                   name="deadline"/>
+                                        </div>
+                                    </div>
+
+                                    <div id="todo-description">
+                                        <p></p>
+                                    </div>
+
+                                    <textarea class="form-control d-none" name="description"
+                                              id="todo-description-input"></textarea>
+                                    <div class="d-none">
+                                        <img th:src="@{/img/wtf.gif}" alt="..."/>
+                                    </div>
+                                </div>
+                                <div class="position-absolute bottom-0 end-0 d-none" id="todo-action-buttons">
+                                    <label type="button" class="btn btn-white" onclick="toggleTodoEdit()"
+                                           for="todo-edit-check">Отменить</label>
+                                    <button type="submit" class="btn btn-pony" id="editCaseBtn">Сохранить</button>
+                                </div>
+
+                                <script>
+                                    var todo_elements = {
+                                        "todo-name": $('#todo-name'),
+                                        "todo-name-input": $('#todo-name-input'),
+                                        "todo-description": $('#todo-description'),
+                                        "todo-description-input": $('#todo-description-input'),
+                                        "todo-deadline": $('#todo-deadline'),
+                                        "todo-action-buttons": $('#todo-action-buttons'),
+                                        "todo-deadline-input": $('#todo-deadline-input'),
+                                    };
+
+                                    function toggleTodoEdit() {
+                                        for (let element in todo_elements) {
+                                            todo_elements[element].toggleClass('d-none');
+                                        }
+                                    }
+                                </script>
+                            </form>
+                        </div>
+
+                        <!-- list of todo -->
+                        <div class="position-absolute top-0 w-100 d-flex flex-column" id="todo-list">
+                            <!-- toolbar -->
+                            <div class="buttons shadow-sm px-2 py-1 bg-light">
+                                <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
+                                    <div class="btn-group me-2" role="group" aria-label="Second group">
+                                        <button type="button" class="btn btn-pony" data-bs-toggle="modal"
+                                                data-bs-target="#newTodoModal">
+                                            <i class="fa fa-plus" aria-hidden="true"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-pony">
+                                            <a class="fa fa-download" style="color: white" aria-hidden="true" th:href="@{/api/notes/case/todos.txt}" download></a>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="list-group mt-3 btn-group" id="todo-wrapper" role="group">
+                                <th:block th:each="case : ${cases}">
+                                    <div class="todo" th:classappend="${case.getIsDone()} ?  'complete'"
+                                         th:id="${'todo-' + case.id}" th:name="${case.id}">
+                                        <input type="radio" class="btn-check" name="todo" id="todo1" autocomplete="off">
+                                        <!-- todo: js-->
+                                        <a href="#" for="todo1" class="h-100 list-group-item list-group-item-action"
+                                           aria-current="true">
+                                            <div class="d-flex w-100 justify-content-between">
+                                                <h5 class="mb-1" th:text="${case.name}"></h5>
+                                                <small th:text="${case.deadlineFormatted}"></small>
+                                            </div>
+                                            <span class="d-inline-block text-truncate" style="max-width: 300px;"
+                                                  th:text="${case.description}"></span>
+                                        </a>
+                                    </div>
+                                </th:block>
+                            </div>
+                        </div>
+                        <!-- calendar navigator -->
+                        <div class="btn-toolbar organizerContainerWrapper position-absolute bottom-0 justify-content-between w-100 mb-3"
+                             role="toolbar" aria-label="Toolbar with button groups">
+                            <div id="organizerContainer" class="w-100"></div>
+                        </div>
+                    </div>
+
+                    <!-- right -->
+                    <div class="w-75 h-100 position-relative right-part">
+
+                        <div id="note-fullsize" class="w-25 shadow">
+                            <form th:action="@{/notes/editNote}" method="post" id="edit-note-form">
+                                <div class="offcanvas-header">
+                                    <div>
+                                        <h5 class="offcanvas-title" id="note-name">List group item heading</h5>
+                                        <input type="text" id="note-name-input" name="name"
+                                               class="form-control offcanvas-title h5 d-none" placeholder="Название"
+                                               value="List group item heading">
+                                        <input type="hidden" id="note-input-id" name="id">
+                                    </div>
+                                    <div>
+                                        <div class="btn-group" role="group"
+                                             aria-label="Basic checkbox toggle button group">
+                                            <input type="checkbox" class="btn-check" id="deleteNoteCheckbox"
+                                                   autocomplete="off" onclick="deleteNote()">
+                                            <label class="btn btn-outline-danger" for="deleteNoteCheckbox">
+                                                <i class="fa fa-trash" aria-hidden="true"></i>
+                                            </label>
+                                            <input type="checkbox" class="btn-check" id="note-edit-check"
+                                                   autocomplete="off">
+                                            <label class="btn btn-outline-secondary" for="note-edit-check"
+                                                   onclick="toggleNoteEdit()">
+                                                <i class="fa fa-edit" aria-hidden="true"></i>
+                                            </label>
+
+                                        </div>
+
+                                        <button type="button" class="btn-close text-reset"
+                                                onclick="{toggleNoteFullSize(); $('div.note.note-pony')[0].classList.remove('note-pony')}"
+                                                aria-label="Закрыть"></button>
+                                    </div>
+
+                                </div>
+                                <div class="offcanvas-body">
+                                    <div id="note-description">
+                                        <p></p>
+                                    </div>
+
+                                    <textarea class="form-control d-none" name="description"
+                                              id="note-description-input"></textarea>
+                                    <div class="d-none">
+                                        <img th:src="@{/img/wtf.gif}" alt="..."/>
+                                    </div>
+                                </div>
+                                <div class="position-absolute bottom-0 end-0 d-none" id="note-action-buttons">
+                                    <div class="p-2">
+                                        <label type="button" class="btn btn-white" onclick="toggleNoteEdit()"
+                                               for="note-edit-check">Отменить</label>
+                                        <button type="submit" class="btn btn-pony">Сохранить</button>
+                                    </div>
+                                </div>
+
+                                <script>
+                                    var note_elements = {
+                                        "note-name": $('#note-name'),
+                                        "note-name-input": $('#note-name-input'),
+                                        "note-description": $('#note-description'),
+                                        "note-description-input": $('#note-description-input'),
+                                        "note-action-buttons": $('#note-action-buttons'),
+                                    };
+
+                                    function toggleNoteEdit() {
+                                        for (let element in note_elements) {
+                                            note_elements[element].toggleClass('d-none');
+                                        }
+                                    }
+                                </script>
+                            </form>
+                        </div>
+
+                        <div class="position-absolute top-0 d-flex flex-column" id="note-list">
+                            <!-- toolbar -->
+                            <div class="buttons shadow-sm px-2 py-1 bg-light toolbar">
+                                <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
+                                    <div class="btn-group me-2" role="group" aria-label="Second group">
+                                        <button type="button" class="btn btn-pony" data-bs-toggle="modal"
+                                                data-bs-target="#newNoteModal">
+                                            <i class="fa fa-plus" aria-hidden="true"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-pony">
+                                            <a class="fa fa-download" style="color: white" aria-hidden="true" th:href="@{/api/notes/note/notes.txt}" download></a>
+                                        </button>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="list-group mt-3 btn-group" id="note-wrapper" role="group">
+                                <div class="mh-100 container mt-3 d-flex flex-row align-content-start flex-wrap"
+                                     id="note-container">
+                                    <th:block th:each="note : ${notes}">
+                                        <div class="card note">
+                                            <div class="card-body">
+                                                <input type="hidden" th:value="${'note-' + note.id}">
+                                                <h5 class="card-title" th:text="${note.name}"></h5>
+                                                <div class="card-text overflow-test-js"
+                                                     th:text="${note.description}"></div>
+                                            </div>
+                                        </div>
+                                    </th:block>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="position-absolute top-0 gif-top-wrapper">
+                <img th:src="@{/img/tblk.gif}" class="gif-small" alt=""/>
+                <img th:src="@{/img/twilight-pony.gif}" class="gif-small" alt=""/>
+            </div>
+            <div class="position-absolute bottom-0 end-0 d-flex flex-row">
+                <img th:src="@{/img/you_cant_stop_me.gif}" class="gif-small" alt=""/>
+                <img th:src="@{/img/banana.gif}" class="gif-small" alt=""/>
+            </div>
+        </div>
+
+
+        <!-- Modal for add todo -->
+        <div class="modal fade" id="newTodoModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Добавить задание</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <form th:action="@{/notes/createCase}" method="post" id="create-case-form">
+                        <div class="modal-body">
+                            <div class="row g-3 align-items-center">
+                                <div class="col-auto">
+                                    <label for="new-todo-name" class="col-form-label">Название:</label>
+                                </div>
+                                <div class="col-auto">
+                                    <input type="text" id="new-todo-name" name="name" class="form-control">
+                                </div>
+                                <hr>
+                                <div class="col-auto position-relative mb-4 mt-0">
+                                    <div id="newTodoOrganizerContainer"></div>
+                                    <div class="position-absolute top-0 rounded shadow" id="calendarTodoWrapper">
+                                        <div class="card-header bg-light d-flex flex-row-reverse bd-highlight">
+                                            <button type="button" class="btn-close text-reset"
+                                                    onclick="toggleTodoCalendar('#calendarTodoWrapper')"
+                                                    aria-label="Закрыть"></button>
+                                        </div>
+                                        <div id="newTodoCalendarContainer"></div>
+                                        <input type="hidden" id="new-todo-date-input"
+                                               name="deadline"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="new-todo-description" class="col-form-label">Описание:</label>
+                                <textarea class="form-control" name="description" id="new-todo-description"></textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-white" id="create-case-close-btn"
+                                    data-bs-dismiss="modal">
+                                Отменить
+                            </button>
+                            <button type="submit" class="btn btn-pony">Добавить</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Modal for add note -->
+        <div class="modal fade" id="newNoteModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="note-place">Добавить заметку</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <form th:action="@{/notes/createNote}" id="create-note-form" method="post">
+                        <div class="modal-body">
+                            <div class="row g-3 align-items-center">
+                                <div class="col-auto">
+                                    <label for="new-note-name" class="col-form-label">Название:</label>
+                                </div>
+                                <div class="col-auto">
+                                    <input type="text" id="new-note-name" class="form-control" name="name">
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="new-note-description" class="col-form-label">Описание:</label>
+                                <textarea class="form-control" id="new-note-description" name="description"></textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-white" data-bs-dismiss="modal"
+                                    id="create-note-close-btn">
+                                Отменить
+                            </button>
+                            <button type="submit" class="btn btn-pony">Добавить</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Calendar -->
+        <div class=" w-25" id="calendarWrapper">
+            <div class="card card-body p-0">
+                <div class="card-header bg-light d-flex flex-row-reverse bd-highlight">
+                    <button type="button" class="btn-close text-reset m-0" onclick="toggleCalendar()"
+                            aria-label="Закрыть"></button>
+                </div>
+                <div id="calendarContainer"></div>
+            </div>
+        </div>
+
+        <script>
+            var calendar = new Calendar("calendarContainer", "small", ["Понедельник", 3], ["#9f9fff", "#9f9fff", "#ffffff", "#ffffff"], {
+                days: ["Воскресенье", "Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота"],
+                months: ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"],
+                indicator: true,
+                indicator_type: 1,
+                indicator_pos: "bottom",
+            });
+            var mainCalendarCollapsed = false;
+            var todoCollapsed = false;
+            var noteCollapsed = false;
+            var todoWidth = $('#todo-fullsize').width();
+            var noteHeight = $('#note-fullsize').height();
+
+            console.log(calendar);
+
+            var options = {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric'
+            };
+            var target_date = (new Date(calendar.today)).toLocaleString("ru", options);
+
+
+            function toggleCalendar() {
+                if (!mainCalendarCollapsed) {
+                    gsap.fromTo("#calendarWrapper", {
+                        opacity: 0,
+                        display: 'none',
+                        y: -400
+                    }, {
+                        // borderRadius: 50,
+                        y: -600,
+                        opacity: 1,
+                        display: 'block',
+                        duration: 0.5,
+                    });
+                    console.log('end');
+                } else {
+                    gsap.fromTo("#calendarWrapper", {
+                        opacity: 1,
+                        y: -600,
+                        display: 'block',
+                    }, {
+                        // borderRadius: 50,
+                        y: -400,
+                        opacity: 0,
+                        display: 'none',
+                        duration: 0.3,
+                    });
+                    console.log('end');
+                }
+                mainCalendarCollapsed = !mainCalendarCollapsed;
+            }
+
+
+            function toggleNoteFullSize() {
+                if (!noteCollapsed) {
+                    gsap.fromTo("#note-fullsize", {
+                        display: 'none',
+                        // height: 0,
+                        top: -400,
+                        scaleY: 0,
+                    }, {
+                        // borderRadius: 50,
+                        // height: noteHeight,
+                        scaleY: 1,
+                        top: 0,
+                        display: 'block',
+                        duration: 0.3,
+                    });
+                    console.log('end');
+                } else {
+                    gsap.fromTo("#note-fullsize", {
+                        // height: noteHeight,
+                        scaleY: 1,
+                        top: 0,
+                        display: 'block',
+                    }, {
+                        // borderRadius: 50,
+                        // height: 0,
+                        scaleY: 0,
+                        top: -400,
+                        display: 'none',
+                        duration: 0.2
+                    });
+                    console.log('end');
+
+                }
+                noteCollapsed = !noteCollapsed;
+            }
+
+            function toggleTodoFullSize() {
+                if (!todoCollapsed) {
+                    gsap.fromTo("#todo-fullsize", {
+                        display: 'none',
+                        left: 0,
+                        zIndex: 0,
+                    }, {
+                        // borderRadius: 50,
+                        left: todoWidth,
+                        display: 'block',
+                        duration: 0.5,
+                        zIndex: 1000,
+                    });
+                    console.log('end');
+                } else {
+                    gsap.fromTo("#todo-fullsize", {
+                        left: todoWidth,
+                        display: 'block',
+                        zIndex: 1000,
+                    }, {
+                        // borderRadius: 50,
+                        left: 0,
+                        display: 'none',
+                        duration: 0.3,
+                        zIndex: 0
+                    });
+                    console.log('end');
+
+                }
+                todoCollapsed = !todoCollapsed;
+            }
+
+            function addNoteOnClick(note = null) {
+                if (note === null) {
+                    note = ".note";
+                }
+                $(note).on('click', (e) => {
+                    let target_note = $('div.note.note-pony')[0];
+                    if (target_note != null) {
+                        target_note.classList.remove('note-pony');
+                        console.log(target_note, e.currentTarget, target_note === e.currentTarget)
+                        if (target_note === e.currentTarget) {
+                            toggleNoteFullSize();
+                        } else {
+                            e.currentTarget.classList.add('note-pony');
+                            if (note_elements['note-name'].hasClass('d-none')) toggleNoteEdit();
+                            console.log(e.currentTarget);
+                        }
+                    } else {
+                        toggleNoteFullSize();
+                        e.currentTarget.classList.add('note-pony');
+                        if (note_elements['note-name'].hasClass('d-none')) toggleNoteEdit();
+                    }
+                    console.log(e.currentTarget);
+                    let noteId = e.currentTarget.getElementsByTagName('input')[0].getAttribute('value');
+                    let noteName = e.currentTarget.getElementsByClassName('card-title')[0].innerHTML;
+                    let noteDescription = e.currentTarget.getElementsByClassName('card-text')[0].innerHTML;
+                    console.log(noteId + ' ' + noteName + ' ' + noteDescription);
+                    replaceValuesInEditNote(noteId, noteName, noteDescription);
+                });
+            }
+
+            function completeCase() {
+                console.log()
+                var caseId = $('#completeCaseCheckbox').val();
+                $('#' + caseId).toggleClass('complete');
+
+                $.ajax({
+                    type: "PUT",
+                    contentType: "application/json",
+                    url: "/api/notes/case/" + caseId,
+                    xhrFields: {
+                        withCredentials: true
+                    },
+                    cache: false,
+                    timeout: 600000,
+                    success: function (data, textStatus, xhr) {
+                        if (xhr.readyState === 4) {
+                            {
+                                toggleTodoFullSize();
+                                $('div.todo.todo-pony')[0].classList.remove('todo-pony')
+                            }
+                        }
+                    },
+                })
+            }
+
+            function deleteNote() {
+                let caseId = document.getElementById('deleteNoteCheckbox').getAttribute('value');
+                $.ajax({
+                    type: "DELETE",
+                    contentType: "application/json",
+                    url: "/api/notes/note/" + caseId,
+                    xhrFields: {
+                        withCredentials: true
+                    },
+                    cache: false,
+                    timeout: 600000,
+                    success: function (data, textStatus, xhr) {
+                        if (xhr.readyState === 4) {
+                            {
+                                toggleNoteFullSize();
+                                $('div.note.note-pony')[0].classList.remove('note-pony')
+                            }
+                            redrawNotes(data);
+                        }
+                    },
+                })
+            }
+
+            function deleteCase() {
+                let caseId = document.getElementById('deleteCaseCheckbox').getAttribute('value');
+                let url_string = window.location.href;
+                let url = new URL(url_string);
+                let curDate = url.searchParams.get("date");
+                if (curDate == null) {
+                    curDate = '';
+                } else {
+                    curDate = '?date=' + curDate;
+                }
+                $.ajax({
+                    type: "DELETE",
+                    contentType: "application/json",
+                    url: "/api/notes/case/" + caseId + curDate,
+                    xhrFields: {
+                        withCredentials: true
+                    },
+                    cache: false,
+                    timeout: 600000,
+                    success: function (data, textStatus, xhr) {
+                        if (xhr.readyState === 4) {
+                            {
+                                toggleTodoFullSize();
+                                $('div.todo.todo-pony')[0].classList.remove('todo-pony')
+                            }
+                            redrawTodos(data);
+                        }
+                    },
+                })
+            }
+
+            function replaceValuesInEditCase(caseId, caseName, caseDescription, caseDeadline) {
+                document.getElementById('completeCaseCheckbox').setAttribute('value', caseId);
+                document.getElementById('deleteCaseCheckbox').setAttribute('value', caseId);
+                let deadline = document.getElementById('todo-deadline');
+                deadline.getElementsByTagName('span')[0].innerHTML = caseDeadline;
+                document.getElementById('edit-todo-date-input').value = caseDeadline;
+                document.getElementById('edit-todo-id-input').value = caseId;
+                document.getElementById('todo-name').innerHTML = caseName;
+                document.getElementById('todo-name-input').value = caseName;
+                document.getElementById('todo-description-input').value = caseDescription;
+                document.getElementById('todo-description').getElementsByTagName('p')[0].innerHTML = caseDescription;
+            }
+
+            function replaceValuesInEditNote(noteId, noteName, noteDescription) {
+                console.log(document.getElementById('note-fullsize'));
+                document.getElementById('note-name').innerHTML = noteName;
+                document.getElementById('note-input-id').setAttribute('value', noteId);
+                document.getElementById('note-name-input').setAttribute('value', noteName);
+                document.getElementById('deleteNoteCheckbox').setAttribute('value', noteId);
+                let desc = document.getElementById('note-description');
+                desc.getElementsByTagName('p')[0].innerHTML = noteDescription;
+                document.getElementById('note-description-input').innerHTML = noteDescription;
+            }
+
+            function addTodoOnClick(todo = null) {
+                if (todo === null) {
+                    todo = ".todo";
+                }
+                $(todo).on('click', (e) => {
+                    let target_todo = $('div.todo.todo-pony')[0];
+                    if (target_todo != null) {
+                        target_todo.classList.remove('todo-pony');
+                        // console.log(target_todo, e.currentTarget, target_todo === e.currentTarget)
+                        if (target_todo === e.currentTarget) {
+                            toggleTodoFullSize();
+                        } else {
+                            e.currentTarget.classList.add('todo-pony');
+                            if (todo_elements['todo-name'].hasClass('d-none')) toggleTodoEdit();
+                            // console.log(e.currentTarget);
+                        }
+
+                    } else {
+                        toggleTodoFullSize();
+                        e.currentTarget.classList.add('todo-pony');
+                        if (todo_elements['todo-name'].hasClass('d-none')) toggleTodoEdit();
+                    }
+                    let caseId = e.currentTarget.getAttribute('id');
+                    let child = e.currentTarget.getElementsByTagName('a')[0];
+                    let caseDescription = child.getElementsByTagName('span')[0].innerHTML;
+                    let innerChild = child.getElementsByTagName('div')[0];
+                    let caseName = innerChild.getElementsByTagName('h5')[0].innerHTML;
+                    let caseDeadline = innerChild.getElementsByTagName('small')[0].innerHTML;
+                    console.log(caseId + ' ' + caseName + ' ' + caseDescription + ' ' + caseDeadline);
+                    replaceValuesInEditCase(caseId, caseName, caseDescription, caseDeadline);
+                });
+
+            }
+
+            addNoteOnClick();
+            addTodoOnClick();
+
+            let mayBeOverflowingElements = document.getElementsByClassName("overflow-test-js");
+
+
+            var calendarNewTodo = new Calendar("newTodoCalendarContainer", "small", ["Понедельник", 3], ["#9f9fff", "#9f9fff", "#ffffff", "#ffffff"], {
+                days: ["Воскресенье", "Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота"],
+                months: ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"],
+                indicator: true,
+                indicator_type: 1,
+                indicator_pos: "bottom",
+            });
+
+            var mainCalendarHeight = $('#calendarWrapper').height();
+
+
+            var todoCalendarCollapsed = false;
+
+            function toggleTodoCalendar(calendarTarget) {
+                if (!todoCalendarCollapsed) {
+                    gsap.fromTo(calendarTarget, {
+                        opacity: 0,
+                        // scaleY: 0,
+                        display: 'none',
+                        // y: 0
+                    }, {
+                        // borderRadius: 50,
+                        // y: 100,
+                        // scaleY: mainCalendarHeight,
+                        opacity: 1,
+                        display: 'block',
+                        duration: 0.5,
+                    });
+                    console.log('end');
+                } else {
+                    gsap.fromTo(calendarTarget, {
+                        opacity: 1,
+                        // y: 100,
+                        // scaleY: mainCalendarHeight,
+                        display: 'block',
+                    }, {
+                        // borderRadius: 50,
+                        // y: 0,
+                        // scaleY: 0,
+                        opacity: 0,
+                        display: 'none',
+                        duration: 0.3,
+                    });
+                    console.log('end');
+                }
+                todoCalendarCollapsed = !todoCalendarCollapsed;
+            }
+
+            var calendarEditTodo = new Calendar("editTodoCalendarContainer", "small", ["Понедельник", 3], ["#9f9fff", "#9f9fff", "#ffffff", "#ffffff"], {
+                days: ["Воскресенье", "Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота"],
+                months: ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"],
+                indicator: true,
+                indicator_type: 1,
+                indicator_pos: "bottom"
+            });
+
+            const params = new Proxy(new URLSearchParams(window.location.search), {
+                get: (searchParams, prop) => searchParams.get(prop),
+            });
+            let dateFromQuery = params.date;
+            if (dateFromQuery !== null) {
+                var parts = dateFromQuery.split('-');
+                calendar.date = new Date(parts[2], parts[1] - 1, parts[0]);
+            }
+
+            function organizerInput(org_el, input_el) {
+                var targetDate = new Date(org_el.calendar.date);
+                $(input_el).val(targetDate.toLocaleDateString().replaceAll('.', '-'));
+                console.log("DEFAULT TIME (" + input_el + ") = " + targetDate.toLocaleDateString().replaceAll('.', '-'))
+                org_el.setOnClickListener('day-slider',
+                    // Called when the day left arrow is clicked
+                    function () {
+                        var targetDate = new Date(org_el.calendar.date);
+                        $(input_el).val(targetDate.toLocaleDateString().replaceAll('.', '-'));
+                    },
+                    // Called when the day right arrow is clicked
+                    function () {
+                        var targetDate = new Date(org_el.calendar.date);
+                        $(input_el).val(targetDate.toLocaleDateString().replaceAll('.', '-'));
+                    }
+                );
+
+                org_el.setOnClickListener('days-blocks',
+                    // Called when a day block is clicked
+                    function () {
+                        var targetDate = new Date(org_el.calendar.date);
+                        $(input_el).val(targetDate.toLocaleDateString().replaceAll('.', '-'));
+                    }
+                );
+
+            }
+
+            function organizerInputMain(org_el) {
+                org_el.setOnClickListener('day-slider',
+                    // Called when the day left arrow is clicked
+                    function () {
+                        var targetDate = new Date(org_el.calendar.date).toLocaleDateString().replaceAll('.', '-');
+                        const url = new URL(window.location.href);
+                        url.searchParams.set('date', targetDate);
+                        window.history.replaceState(null, null, url);
+                        invalidateCases();
+                    },
+                    // Called when the day right arrow is clicked
+                    function () {
+                        var targetDate = new Date(org_el.calendar.date).toLocaleDateString().replaceAll('.', '-');
+                        const url = new URL(window.location.href);
+                        url.searchParams.set('date', targetDate);
+                        window.history.replaceState(null, null, url);
+                        invalidateCases();
+                    }
+                );
+
+                org_el.setOnClickListener('days-blocks',
+                    // Called when a day block is clicked
+                    function () {
+                        var targetDate = new Date(org_el.calendar.date).toLocaleDateString().replaceAll('.', '-');
+                        const url = new URL(window.location.href);
+                        url.searchParams.set('date', targetDate);
+                        window.history.replaceState(null, null, url);
+                        invalidateCases();
+                        toggleCalendar();
+                    }
+                );
+
+            }
+
+            var organizer = new Organizer("organizerContainer", calendar, {});
+            var organizerNewTodo = new Organizer("newTodoOrganizerContainer", calendarNewTodo, {});
+            var organizerEditTodo = new Organizer("editTodoOrganizerContainer", calendarEditTodo, {});
+
+            organizerInputMain(organizer);
+            organizerInput(organizerNewTodo, '#new-todo-date-input');
+            organizerInput(organizerEditTodo, '#edit-todo-date-input');
+
+            $('#organizerContainer-date').on('click', () => toggleCalendar());
+            $('#newTodoOrganizerContainer-date').on('click', () => toggleTodoCalendar("#calendarTodoWrapper"));
+            $('#editTodoOrganizerContainer-date').on('click', () => toggleTodoCalendar("#calendarEditTodoWrapper"));
+
+            function redrawTodos(todos) {
+                $('#todo-wrapper').empty();
+                todos.forEach(todo => {
+                    console.log(todo);
+                    addTodo(todo);
+                });
+            }
+
+            function addTodo(todo) {
+                let classField = todo['isDone'] ? 'todo complete' : 'todo';
+                var newTodo = $('<div class="' + classField + '" id="todo-' + todo['id'] + '" name="' + todo['id'] + '">' +
+                    '<input type="radio" class="btn-check" name="todo" id="todo1" autocomplete="off">' +
+                    '<a href="#" for="todo1" class="h-100 list-group-item list-group-item-action"' +
+                    'aria-current="true">' +
+                    '<div class="d-flex w-100 justify-content-between">' +
+                    '<h5 class="mb-1">' + todo['name'] + '</h5>' +
+                    '<small>' + todo['deadlineFormatted'] + '</small>' +
+                    '</div>' +
+                    '<span class="d-inline-block text-truncate" style="max-width: 300px;">' + todo['description'] + '</span>' +
+                    '</a>' +
+                    '</div>');
+                $('#todo-wrapper').append(newTodo);
+                addTodoOnClick(newTodo);
+            }
+
+
+            function redrawNotes(notes) {
+                $('#note-container').empty();
+                console.log(notes);
+                notes.forEach(note => {
+                    console.log(note);
+                    addNote(note);
+                });
+            }
+
+            function addNote(note) {
+                var newNote = $('<div class="card note" id="note-' + note['id'] + '" name="note-' + note['id'] + '">' +
+                    '<div class="card-body"> ' +
+                    '<input type="hidden" value="note-' + note['id'] + '">' +
+                    '<h5 class="card-title">' + note['name'] + '</h5>' +
+                    '<div class="card-text overflow-test-js">' + note['description'] + '</div>' +
+                    '</div>' +
+                    '</div>');
+                $('#note-container').append(newNote);
+                addNoteOnClick(newNote);
+            }
+
+            $("#create-case-form").submit(function (e) {
+                e.preventDefault();
+                let name = $("#new-todo-name").val();
+                let deadline = $("#new-todo-date-input").val();
+                let description = $("#new-todo-description").val();
+                console.log("Create case : " + name + " " + deadline + " " + description)
+
+                $.ajax({
+                    type: "POST",
+                    contentType: "application/json",
+                    url: "/api/notes/case",
+                    xhrFields: {
+                        withCredentials: true
+                    },
+                    data: JSON.stringify({name: name, description: description, deadline: deadline}),
+                    cache: false,
+                    timeout: 600000,
+                    success: function (data, textStatus, xhr) {
+                        if (xhr.readyState === 4) {
+                            {
+                                console.log("Case created!")
+                                invalidateCases();
+                            }
+                        }
+                    },
+                })
+                $("#create-case-close-btn").click();
+            });
+
+            $("#edit-note-form").submit(function (e) {
+                e.preventDefault();
+                let name = $("#note-name-input").val();
+                let id = $("#note-input-id").val();
+                let description = $("#note-description-input").val();
+                console.log("Update note : " + id + " " + name + " " + description)
+
+                $.ajax({
+                    type: "PUT",
+                    contentType: "application/json",
+                    url: "/api/notes/note",
+                    xhrFields: {
+                        withCredentials: true
+                    },
+                    data: JSON.stringify({id: id, name: name, description: description}),
+                    cache: false,
+                    timeout: 600000,
+                    success: function (data, textStatus, xhr) {
+                        if (xhr.readyState === 4) {
+                            {
+                                console.log("Note updated!")
+                                invalidateNotes();
+                            }
+                        }
+                    },
+                })
+                toggleNoteFullSize();
+                $('div.note.note-pony')[0].classList.remove('note-pony')
+            });
+
+            $("#edit-case-form").submit(function (e) {
+                e.preventDefault();
+                let name = $("#todo-name-input").val();
+                let id = $("#edit-todo-id-input").val();
+                let deadline = $("#edit-todo-date-input").val();
+                let description = $("#todo-description-input").val();
+                console.log("Update note : " + id + " " + name + " " + description)
+
+                $.ajax({
+                    type: "PUT",
+                    contentType: "application/json",
+                    url: "/api/notes/case",
+                    xhrFields: {
+                        withCredentials: true
+                    },
+                    data: JSON.stringify({id: id, name: name, description: description, deadline: deadline}),
+                    cache: false,
+                    timeout: 600000,
+                    success: function (data, textStatus, xhr) {
+                        if (xhr.readyState === 4) {
+                            {
+                                console.log("Case updated!")
+                                invalidateCases();
+                            }
+                        }
+                    },
+                })
+                toggleTodoFullSize();
+                $('div.todo.todo-pony')[0].classList.remove('todo-pony')
+            });
+
+            $("#reset-navbar").click(function (e) {
+                e.preventDefault();
+                const url = new URL(window.location.href);
+                url.searchParams.delete('date');
+                window.history.replaceState(null, null, url);
+                invalidateCases();
+            });
+
+            $("#create-note-form").submit(function (e) {
+                e.preventDefault();
+                let name = $("#new-note-name").val();
+                let description = $("#new-note-description").val();
+                console.log("Create note : " + name + " " + description)
+
+                $.ajax({
+                    type: "POST",
+                    contentType: "application/json",
+                    url: "/api/notes/note",
+                    xhrFields: {
+                        withCredentials: true
+                    },
+                    data: JSON.stringify({name: name, description: description}),
+                    cache: false,
+                    timeout: 600000,
+                    success: function (data, textStatus, xhr) {
+                        if (xhr.readyState === 4) {
+                            {
+                                console.log("Note created!")
+                                invalidateNotes();
+                            }
+                        }
+                    },
+                })
+                $("#create-note-close-btn").click();
+            });
+
+            function invalidateNotes() {
+                $.ajax({
+                    type: "GET",
+                    contentType: "application/json",
+                    url: "/api/notes/note",
+                    xhrFields: {
+                        withCredentials: true
+                    },
+                    cache: false,
+                    timeout: 600000,
+                    success: function (data, textStatus, xhr) {
+                        if (xhr.readyState === 4) {
+                            {
+                                console.log("Notes received!")
+                                redrawNotes(data);
+                            }
+                        }
+                    },
+                })
+            }
+
+
+            function invalidateCases() {
+                let url_string = window.location.href;
+                let url = new URL(url_string);
+                let curDate = url.searchParams.get("date");
+                if (curDate == null) {
+                    curDate = '';
+                } else {
+                    curDate = '?date=' + curDate;
+                }
+                return $.ajax({
+                    type: "GET",
+                    contentType: "application/json",
+                    url: "/api/notes/case" + curDate,
+                    xhrFields: {
+                        withCredentials: true
+                    },
+                    cache: false,
+                    timeout: 600000,
+                    success: function (data, textStatus, xhr) {
+                        if (xhr.readyState === 4) {
+                            {
+                                console.log("Cases (todos) received!")
+                                redrawTodos(data);
+                            }
+                        }
+                    },
+                })
+            }
+        </script>
+    </div>
+
+
+    <script>
+    </script>
+</div>
+</body>
+
+</html>

@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>403</title>
+</head>
+<body>
+<h1>403 Forbidden</h1>
+
+<h2>У вас нет на это прав</h2>
+
+<th:block th:if="${message != null}">
+    <h2 th:text="${message}"></h2>
+</th:block>
+
+<a th:href="@{/notes}">На главную</a>
+</body>
+</html>
