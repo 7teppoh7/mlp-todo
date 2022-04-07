@@ -174,7 +174,7 @@
                                     </div>
 
                                     <div id="todo-description">
-                                        <p></p>
+                                        <pre><p></p></pre>
                                     </div>
 
                                     <textarea class="form-control d-none" name="description"
@@ -289,7 +289,7 @@
                                 </div>
                                 <div class="offcanvas-body">
                                     <div id="note-description">
-                                        <p></p>
+                                        <pre><p></p></pre>
                                     </div>
 
                                     <textarea class="form-control d-none" name="description"
@@ -348,8 +348,10 @@
                                             <div class="card-body">
                                                 <input type="hidden" th:value="${'note-' + note.id}">
                                                 <h5 class="card-title" th:text="${note.name}"></h5>
-                                                <div class="card-text overflow-test-js"
+                                                <pre class="w-100 overflow-hidden">
+                                                    <div class="card-text overflow-test-js"
                                                      th:text="${note.description}"></div>
+                                                </pre>
                                             </div>
                                         </div>
                                     </th:block>
@@ -942,7 +944,7 @@
                     '<div class="card-body"> ' +
                     '<input type="hidden" value="note-' + note['id'] + '">' +
                     '<h5 class="card-title">' + note['name'] + '</h5>' +
-                    '<div class="card-text overflow-test-js">' + note['description'] + '</div>' +
+                    '<pre><div class="card-text overflow-test-js">' + note['description'] + '</div></pre>' +
                     '</div>' +
                     '</div>');
                 $('#note-container').append(newNote);
